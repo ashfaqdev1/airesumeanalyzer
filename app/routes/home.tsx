@@ -3,7 +3,7 @@ import type { Route } from "./+types/home";
 import NavBar from "~/components/NavBar";
 import { usePuterStore } from "../lib/puter";
 import { Link, useNavigate } from "react-router";
-import ResumeCard from "./ResumeCard";
+import ResumeCard from "../components/ResumeCard";
 import { useEffect } from "react";
 
 export function meta({}: Route.MetaArgs) {
