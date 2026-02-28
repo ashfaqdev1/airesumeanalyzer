@@ -22,29 +22,45 @@ const resume = () => {
 
   useEffect(() => {
     const loadResume = async () => {
-      const resume = await kv.get(`resume:${id}`);
+      try {
+        const resume = await kv.get(`resume:${id}`);
+        if (!resume) return;
 
-      if (!resume) return;
+        const data = JSON.parse(resume);
 
-      const data = JSON.parse(resume);
+        const cleanFeedback =
+          typeof data.feedback === "string"
+            ? JSON.parse(JSON.parse(JSON.parse(data.feedback)))
+            : data.feedback;
 
-      const resumeBlob = await fs.read(data.resumePath);
-      if (!resumeBlob) return;
+        // Load PDF
+        const resumeBlob = await fs.read(data.resumePath);
+        const pdfUrl = URL.createObjectURL(
+          new Blob([resumeBlob], { type: "application/pdf" }),
+        );
+        setResumeUrl(pdfUrl);
 
-      const pdfBlob = new Blob([resumeBlob], { type: "application/pdf" });
-      const resumeUrl = URL.createObjectURL(pdfBlob);
-      setResumeUrl(resumeUrl);
+        // Load Image
+        const imageBlob = await fs.read(data.imagePath);
+        const imgUrl = URL.createObjectURL(new Blob([imageBlob]));
+        setImageUrl(imgUrl);
 
-      const imageBlob = await fs.read(data.imagePath);
-      if (!imageBlob) return;
-      const imageUrl = URL.createObjectURL(imageBlob);
-      setImageUrl(imageUrl);
-
-      setFeedback(data.feedback);
-      console.log(data);
+        setFeedback(cleanFeedback);
+        // console.log(JSON.parse(JSON.parse(data.feedback)));
+      } catch (error) {
+        console.error("Failed to load resume:", error);
+      }
     };
+
     loadResume();
-  });
+
+    // CLEANUP: This prevents memory leaks by revoking the URLs when
+    // the component unmounts or the ID changes.
+    return () => {
+      if (resumeUrl) URL.revokeObjectURL(resumeUrl);
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [id]); // Only re-run if id changes
   return (
     <main className="!pt-0">
       <nav className="resume-nav">
@@ -75,7 +91,7 @@ const resume = () => {
           {feedback ? (
             <div className="flex flex-col gap-8 animate-in fade-in duration-1000">
               <Summary feedback={feedback} />
-              {/* <Ats score={feedback.ATS.score} /> */}
+              <Ats score={feedback.ATS.score} />
               <Details feedback={feedback} />
             </div>
           ) : (

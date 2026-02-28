@@ -1,6 +1,6 @@
 import React from "react";
 
-const Details = () => {
+const Details = ({ feedback }: { feedback: Feedback | null }) => {
   return <div>Details</div>;
 };
 

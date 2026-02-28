@@ -92,7 +92,7 @@ export const resumes: Resume[] = [
 ];
 
 export const AIResponseFormat = `
-      interface Feedback {
+      {interface Feedback {
       overallScore: number; //max 100
       ATS: {
         score: number; //rate based on ATS suitability
@@ -133,7 +133,7 @@ export const AIResponseFormat = `
           explanation: string; //explain in detail here
         }[]; //give 3-4 tips
       };
-    }`;
+    }}`;
 
 export const prepareInstructions = ({
   jobTitle,

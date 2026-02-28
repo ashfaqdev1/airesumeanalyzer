@@ -1,6 +1,6 @@
 import React from "react";
 
-const Ats = () => {
+const Ats = ({ score }: { score: number | null }) => {
   return <div>Ats</div>;
 };
 
